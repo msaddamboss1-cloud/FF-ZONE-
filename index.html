@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF ZONE - Ultimate Gaming Platform</title>
+
+    <!-- লোগো দ্রুত লোড করার জন্য অপটিমাইজড লিংক -->
+    <link rel="preload" as="image" href="https://i.ibb.co.com/GD2TNhV/Screenshot-2026-08-30-14-09-34-700-com-google-android-apps-photos.png">
+    
+    <!-- গুগল ফন্টস -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #ff0055;
+            --secondary-color: #00f2fe;
+            --bg-color: #0b0c12;
+            --card-bg: #141622;
+            --text-main: #ffffff;
+            --text-muted: #a0a5b8;
+            --border-color: #222638;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* হেডার - সিম্পল ও ক্লিন */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 8%;
+            background: rgba(11, 12, 18, 0.95);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--primary-color);
+            backdrop-filter: blur(8px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #1f2233;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+        }
+
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .brand-text {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .brand-text span {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 150px 20px 80px;
+            background: radial-gradient(circle at center top, #1a1c2e 0%, var(--bg-color) 75%);
+        }
+
+        .hero h1 {
+            font-size: 44px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .hero h1 span {
+            color: var(--secondary-color);
+            text-shadow: 0 0 15px var(--secondary-color);
+        }
+
+        .hero p {
+            max-width: 750px;
+            margin: 0 auto 35px;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .btn-cta {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-color), #ff471a);
+            color: #fff;
+            padding: 15px 42px;
+            font-size: 19px;
+            font-weight: 700;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 0 35px rgba(255, 0, 85, 0.8);
+        }
+
+        /* সেকশন লেআউট */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 45px;
+            position: relative;
+        }
+
+        .section-title span {
+            color: var(--primary-color);
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 70px;
+            height: 4px;
+            background: var(--secondary-color);
+            margin: 10px auto 0;
+            border-radius: 2px;
+            box-shadow: 0 0 8px var(--secondary-color);
+        }
+
+        /* About Section */
+        .about-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 35px;
+            border-radius: 15px;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .about-box p {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        /* Features Grid */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px 20px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-6px);
+            box-shadow: 0 8px 25px rgba(255, 0, 85, 0.15);
+        }
+
+        .card-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* How It Works Section */
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .step-box {
+            background: #10121d;
+            border: 1px dashed var(--secondary-color);
+            padding: 25px 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .step-num {
+            width: 35px;
+            height: 35px;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin: 0 auto 15px;
+        }
+
+        .step-box h4 {
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .step-box p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* FAQ Section */
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .faq-item h4 {
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            font-size: 17px;
+        }
+
+        .faq-item p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Banner CTA */
+        .banner-cta {
+            background: linear-gradient(90deg, #181b2b 0%, #291024 100%);
+            border: 1px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .banner-cta h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: #06070a;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid #161824;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 30px; }
+            .hero p { font-size: 15px; }
+            .section-title { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- হেডার -->
+    <header>
+        <a href="index.html" class="brand">
+            <div class="logo-box">
+                <img src="https://i.ibb.co.com/GD2TNhV/Screenshot-2026-08-30-14-09-34-700-com-google-android-apps-photos.png" alt="FF ZONE Logo" fetchpriority="high" loading="eager">
+            </div>
+            <div class="brand-text">FF <span>ZONE</span></div>
+        </a>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Welcome to <span>FF ZONE</span><br>গেমিং জগতের নতুন অভিজ্ঞতা</h1>
+        <p>আপনার গেমিং প্যাশনকে নিয়ে যান পরবর্তী ধাপে। FF ZONE একটি আধুনিক প্ল্যাটফর্ম যেখানে আপনি বিভিন্ন Gaming Events, Community Competitions এবং এক্সক্লুসিভ ফিচারসমূহ পাবেন একসাথে।</p>
+        <a href="login.html" class="btn-cta">Start Now</a>
+    </section>
+
+    <div class="container">
+        <!-- About Us Section -->
+        <div class="about-box">
+            <h2 style="color: #fff; margin-bottom: 15px;">About <span>FF ZONE</span></h2>
+            <p>FF ZONE হলো গেমারদের জন্য তৈরি একটি নিবেদিত প্ল্যাটফর্ম। আপনি প্রফেশনাল গেমার হন কিংবা শখের প্লেয়ার, আমাদের এই পোর্টালে আপনার জন্য রয়েছে দারুণ সব সুবিধা। আমাদের মূল লক্ষ্য হলো গেমারদের একই ছাদের নিচে নিয়ে আসা এবং তাদের চমৎকার গেমিং এক্সপেরিয়েন্স প্রদান করা।</p>
+        </div>
+
+        <!-- Features Section -->
+        <h2 class="section-title">আমাদের <span>Features</span> সমূহ</h2>
+        <div class="grid-cards">
+            <div class="card">
+                <div class="card-icon">🎮</div>
+                <h3>Live Tournaments</h3>
+                <p>নিয়মিত গেমিং টুর্নামেন্ট এবং প্রতিযোগিতায় অংশ নিয়ে আপনার স্কিল প্রমাণ করার সুযোগ।</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>Fast Response</h3>
+                <p>আমাদের সিস্টেম অত্যন্ত ফাস্ট এবং রেসপন্সিভ, যা আপনার ইউজার এক্সপেরিয়েন্স বাড়িয়ে দেয়।</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">👥</div>
+                <h3>Gamer Community</h3>
+                <p>হাজারো সক্রিয় গেমারের সাথে কানেক্ট হোন, স্কোয়াড গঠন করুন এবং অভিজ্ঞতা শেয়ার করুন।</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔒</div>
+                <h3>Secure Profile</h3>
+                <p>আপনার অ্যাকাউন্ট ডাটা এবং পার্সোনাল ইনফরমেশন সম্পূর্ণ সুরক্ষিত ও নিরাপদ।</p>
+            </div>
+        </div>
+
+        <!-- How It Works Section -->
+        <div style="margin-top: 70px;">
+            <h2 class="section-title">How It <span>Works</span></h2>
+            <div class="steps-container">
+                <div class="step-box">
+                    <div class="step-num">১</div>
+                    <h4>Start Now বাটনে ক্লিক করুন</h4>
+                    <p>সরাসরি Login পেজে যেতে Start Now বাটনটিতে চাপ দিন।</p>
+                </div>
+                <div class="step-box">
+                    <div class="step-num">২</div>
+                    <h4>Account তৈরি বা লগইন করুন</h4>
+                    <p>আপনার প্রোফাইল তথ্য দিয়ে সহজে একাউন্ট এক্সেস করুন।</p>
+                </div>
+                <div class="step-box">
+                    <div class="step-num">৩</div>
+                    <h4>Events এ যোগ দিন</h4>
+                    <p>আপনার পছন্দের ইভেন্ট বা টুর্নামেন্টে যুক্ত হয়ে গেমিং এনজয় করুন।</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div style="margin-top: 70px;">
+            <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
+            <div class="faq-item">
+                <h4>প্রশ্ন: FF ZONE-এ যুক্ত হতে কি কোনো ফি লাগে?</h4>
+                <p>উত্তর: না, এখানে রেজিস্ট্রেশন এবং অ্যাকাউন্ট অ্যাক্সেস সম্পূর্ণ ফ্রি।</p>
+            </div>
+            <div class="faq-item">
+                <h4>প্রশ্ন: Start Now বাটন দিয়ে কিভাবে পরবর্তী ধাপে যাব?</h4>
+                <p>উত্তর: Start Now বাটনে চাপ দিলে আপনাকে সরাসরি Login পেজে নিয়ে যাওয়া হবে, সেখানে আপনি Login বা Register দুটি অপশনই পাবেন।</p>
+            </div>
+            <div class="faq-item">
+                <h4>প্রশ্ন: সাপোর্ট টিম সাহায্য করবে কিভাবে?</h4>
+                <p>উত্তর: অ্যাকাউন্টে লগইন করার পর ড্যাশবোর্ড থেকে সহজেই সাপোর্ট সেন্টারে যোগাযোগ করতে পারবেন।</p>
+            </div>
+        </div>
+
+        <!-- Banner CTA Section -->
+        <div class="banner-cta">
+            <h2>আজই যুক্ত হোন FF ZONE পরিবারে!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">আর দেরি না করে এখনই শুরু করুন আপনার গেমিং জার্নি।</p>
+            <a href="login.html" class="btn-cta">Start Now</a>
+        </div>
+    </div>
+
+    <!-- ফুটার -->
+    <footer>
+        <p>&copy; ২০২৬ FF ZONE. All Rights Reserved.</p>
+    </footer>
+
+</body>
+  </html>
