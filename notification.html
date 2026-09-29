@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -72,39 +72,45 @@
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyA8jX_M4iqwdMm-RP10CUjd664GZrnrmQA",
-            authDomain: "rz-mod-menu.firebaseapp.com",
-            databaseURL: "https://rz-mod-menu-default-rtdb.firebaseio.com",
-            projectId: "rz-mod-menu",
-            storageBucket: "rz-mod-menu.firebasestorage.app",
-            messagingSenderId: "426988321516",
-            appId: "1:426988321516:web:33c8fd9492ee0ad58b03c9",
-            measurementId: "G-EDC9TH795S"
+          apiKey: "AIzaSyA8jX_M4iqwdMm-RP10CUjd664GZrnrmQA",
+          authDomain: "rz-mod-menu.firebaseapp.com",
+          databaseURL: "https://rz-mod-menu-default-rtdb.firebaseio.com",
+          projectId: "rz-mod-menu",
+          storageBucket: "rz-mod-menu.firebasestorage.app",
+          messagingSenderId: "426988321516",
+          appId: "1:426988321516:web:33c8fd9492ee0ad58b03c9",
+          measurementId: "G-EDC9TH795S"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const messaging = getMessaging(app);
 
-        // ব্রাউজার নোটিফিকেশন পারমিশন চাওয়া
-        Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-                getToken(messaging, { vapidKey: 'BKhgwTpdMogToFFkYYOnk0odAHdYXJ9Ek9LbylOwXy6ZNb2t9P--9pT6NdkT2o6A7c2l3dic_f6zHnbqRil3ppk' })
-                .then((currentToken) => {
-                    console.log("FCM Token:", currentToken);
-                }).catch((err) => console.log('Token Error: ', err));
-            }
-        });
-
-        // ফোরগ্রাউন্ড পুশ নোটিফিকেশন (অ্যাপ খোলা থাকলে ফোনের উপরে পপ-আপ মেসেজ শো করার জন্য)
-        onMessage(messaging, (payload) => {
-            new Notification(payload.notification.title, {
-                body: payload.notification.body,
-                icon: '/icon.png'
+        // সার্ভিস ওয়ার্কার রেজিস্টার ও পুশ পারমিশন
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/firebase-messaging-sw.js')
+            .then((registration) => {
+                Notification.requestPermission().then((permission) => {
+                    if (permission === 'granted') {
+                        getToken(messaging, { 
+                            vapidKey: 'BKhgwTpdMogToFFkYYOnk0odAHdYXJ9Ek9LbylOwXy6ZNb2t9P--9pT6NdkT2o6A7c2l3dic_f6zHnbqRil3ppk',
+                            serviceWorkerRegistration: registration 
+                        }).then((currentToken) => {
+                            console.log("Token Received:", currentToken);
+                        }).catch(err => console.log("Token error:", err));
+                    }
+                });
             });
+        }
+
+        // অ্যাপ স্ক্রিনে নোটিফিকেশন প্রদর্শন
+        onMessage(messaging, (payload) => {
+            const title = payload.notification ? payload.notification.title : payload.data.title;
+            const body = payload.notification ? payload.notification.body : payload.data.message;
+            new Notification(title, { body: body });
         });
 
-        // কপি ফাংশন
+        // কপি বাটন
         window.copyText = function(text, btnElement) {
             navigator.clipboard.writeText(text).then(() => {
                 const orig = btnElement.innerHTML;
@@ -119,7 +125,7 @@
             });
         };
 
-        // ফায়ারস্টোর থেকে লাইভ ডাটা লোড
+        // ফায়ারস্টোর থেকে রিয়েলটাইম নোটিফিকেশন লোড
         const q = query(collection(db, "notifications"), orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const container = document.getElementById("notification-list");
@@ -167,6 +173,9 @@
                 `;
             });
             badge.innerText = count;
+        }, (error) => {
+            console.error("Firestore error:", error);
+            document.getElementById("notification-list").innerHTML = `<div class="empty-msg" style="color:#ff2a6d">ডেটা লোড করতে সমস্যা হয়েছে!</div>`;
         });
     </script>
 </body>
