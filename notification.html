@@ -11,8 +11,7 @@
         
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1f2a3e; }
         .nav-left { display: flex; align-items: center; gap: 12px; }
-        .back-btn { font-size: 18px; color: #fff; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #141a26; border: 1px solid #1f2a3e; border-radius: 50%; transition: 0.2s; }
-        .back-btn:active { transform: scale(0.95); }
+        .back-btn { font-size: 18px; color: #fff; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #141a26; border: 1px solid #1f2a3e; border-radius: 50%; }
 
         .logo-text { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
         .logo-text .ff { color: #ff2a6d; }
@@ -24,52 +23,35 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.6));
-            animation: bellGlow 2s infinite alternate;
-        }
-
-        @keyframes bellGlow {
-            0% { filter: drop-shadow(0 0 4px rgba(255, 42, 109, 0.6)); }
-            100% { filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.9)); }
         }
 
         .badge { position: absolute; top: -5px; right: -8px; background: #ff2a6d; color: #fff; font-size: 11px; font-weight: bold; border-radius: 50%; padding: 2px 6px; border: 1px solid #0d111a; }
 
         .notif-header { display: flex; justify-content: space-between; align-items: center; margin: 18px 0 12px; }
         .notif-title { font-size: 16px; font-weight: bold; color: #fff; }
-        .info-tag { font-size: 11px; color: #8292a6; }
 
-        .notif-card { background: #141a26; border: 1px solid #1f2a3e; border-radius: 12px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #ff2a6d; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .notif-card { background: #141a26; border: 1px solid #1f2a3e; border-radius: 12px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #ff2a6d; }
         .notif-card.all-user { border-left-color: #00e5ff; }
-        .notif-card h4 { font-size: 15px; color: #ffffff; margin-bottom: 6px; font-weight: 700; }
+        .notif-card h4 { font-size: 15px; color: #ffffff; margin-bottom: 6px; }
         .notif-card p { font-size: 13px; color: #a0aec0; line-height: 1.4; word-break: break-word; }
 
-        /* Room ID & Pass Copy Section */
-        .room-details-box { background: #0d111a; border: 1px dashed #00e5ff; border-radius: 8px; padding: 10px 12px; margin: 10px 0; display: flex; flex-direction: column; gap: 8px; }
+        .room-details-box { background: #0d111a; border: 1px dashed #00e5ff; border-radius: 8px; padding: 10px; margin: 10px 0; display: flex; flex-direction: column; gap: 8px; }
         .room-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
-        .room-val { color: #00e5ff; font-family: monospace; font-size: 15px; letter-spacing: 0.5px; }
-        .btn-copy { background: #ff2a6d; color: #fff; border: none; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
-        .btn-copy:active { transform: scale(0.92); }
+        .room-val { color: #00e5ff; font-family: monospace; font-size: 14px; }
+        .btn-copy { background: #ff2a6d; color: #fff; border: none; padding: 5px 10px; font-size: 11px; font-weight: bold; border-radius: 5px; cursor: pointer; }
 
         .notif-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: #64748b; }
         .target-badge { background: #0d111a; padding: 3px 8px; border-radius: 4px; border: 1px solid #1f2a3e; color: #00e5ff; font-weight: 600; }
-
-        .empty-state { text-align: center; color: #64748b; padding: 40px 10px; font-size: 14px; }
-        .empty-state i { font-size: 36px; margin-bottom: 10px; color: #1f2a3e; display: block; }
+        .empty-msg { text-align: center; color: #64748b; padding: 30px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="nav-bar">
         <div class="nav-left">
-            <!-- ড্যাশবোর্ডের ব্যাক বাটন -->
-            <a href="dashboard.html" class="back-btn">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <div class="logo-text">
-                <span class="ff">FF</span> <span class="zone">ZONE</span>
-            </div>
+            <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="logo-text"><span class="ff">FF</span> <span class="zone">ZONE</span></div>
         </div>
-
         <div class="bell-box">
             <i class="fa-solid fa-bell bell-icon"></i>
             <span class="badge" id="notif-count">0</span>
@@ -77,74 +59,115 @@
     </div>
 
     <div class="notif-header">
-        <span class="notif-title">নোটিফিকেশন সমূহ</span>
-        <span class="info-tag">*গত ৭ দিনের নোটিফিকেশন</span>
+        <span class="notif-title">নোটিফিকেশন সমুহ</span>
     </div>
 
     <div id="notification-list">
-        <!-- কোনো ডেমো নোটিফিকেশন রাখা হয়নি। নতুন নোটিফিকেশন না থাকলে এই মেসেজ দেখাবে -->
-        <div class="empty-state">
-            <i class="fa-regular fa-bell-slash"></i>
-            কোনো নোটিফিকেশন পাওয়া যায়নি!
-        </div>
+        <div class="empty-msg">লোডিং নোটিফিকেশন...</div>
     </div>
 
-    <script>
-        // কপি করার গ্লোবাল ফাংশন
-        function copyText(text, btnElement) {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8jX_M4iqwdMm-RP10CUjd664GZrnrmQA",
+            authDomain: "rz-mod-menu.firebaseapp.com",
+            databaseURL: "https://rz-mod-menu-default-rtdb.firebaseio.com",
+            projectId: "rz-mod-menu",
+            storageBucket: "rz-mod-menu.firebasestorage.app",
+            messagingSenderId: "426988321516",
+            appId: "1:426988321516:web:33c8fd9492ee0ad58b03c9",
+            measurementId: "G-EDC9TH795S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const messaging = getMessaging(app);
+
+        // ব্রাউজার নোটিফিকেশন পারমিশন চাওয়া
+        Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                getToken(messaging, { vapidKey: 'BKhgwTpdMogToFFkYYOnk0odAHdYXJ9Ek9LbylOwXy6ZNb2t9P--9pT6NdkT2o6A7c2l3dic_f6zHnbqRil3ppk' })
+                .then((currentToken) => {
+                    console.log("FCM Token:", currentToken);
+                }).catch((err) => console.log('Token Error: ', err));
+            }
+        });
+
+        // ফোরগ্রাউন্ড পুশ নোটিফিকেশন (অ্যাপ খোলা থাকলে ফোনের উপরে পপ-আপ মেসেজ শো করার জন্য)
+        onMessage(messaging, (payload) => {
+            new Notification(payload.notification.title, {
+                body: payload.notification.body,
+                icon: '/icon.png'
+            });
+        });
+
+        // কপি ফাংশন
+        window.copyText = function(text, btnElement) {
             navigator.clipboard.writeText(text).then(() => {
-                const origText = btnElement.innerHTML;
+                const orig = btnElement.innerHTML;
                 btnElement.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
                 btnElement.style.background = "#00e5ff";
                 btnElement.style.color = "#0d111a";
                 setTimeout(() => {
-                    btnElement.innerHTML = origText;
+                    btnElement.innerHTML = orig;
                     btnElement.style.background = "#ff2a6d";
                     btnElement.style.color = "#fff";
                 }, 1500);
             });
-        }
+        };
 
-        // রেন্ডারিং হেলপার (আপনার ব্যাকএন্ড বা লোকাল ডেটার সাথে কানেক্ট করতে এই ফাংশন ব্যবহার করবেন)
-        function renderNotification(data) {
+        // ফায়ারস্টোর থেকে লাইভ ডাটা লোড
+        const q = query(collection(db, "notifications"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
             const container = document.getElementById("notification-list");
-            const emptyState = container.querySelector(".empty-state");
-            if (emptyState) emptyState.remove();
+            const badge = document.getElementById("notif-count");
 
-            let roomBoxHtml = '';
-            if (data.hasRoomDetails) {
-                roomBoxHtml = `
-                    <div class="room-details-box">
-                        <div class="room-row">
-                            <span>Room ID: <span class="room-val">${data.roomId}</span></span>
-                            <button class="btn-copy" onclick="copyText('${data.roomId}', this)"><i class="fa-regular fa-copy"></i> Copy ID</button>
-                        </div>
-                        ${data.roomPass ? `
-                        <div class="room-row">
-                            <span>Password: <span class="room-val">${data.roomPass}</span></span>
-                            <button class="btn-copy" onclick="copyText('${data.roomPass}', this)"><i class="fa-regular fa-copy"></i> Copy Pass</button>
-                        </div>` : ''}
-                    </div>
-                `;
+            if (snapshot.empty) {
+                container.innerHTML = `<div class="empty-msg">কোনো নোটিফিকেশন পাওয়া যায়নি</div>`;
+                badge.innerText = "0";
+                return;
             }
 
-            const card = document.createElement("div");
-            card.className = `notif-card ${data.target === 'ALL' ? 'all-user' : ''}`;
-            card.innerHTML = `
-                <h4>${data.title}</h4>
-                <p>${data.message}</p>
-                ${roomBoxHtml}
-                <div class="notif-meta">
-                    <span class="target-badge">${data.targetLabel || 'সাধারণ নোটিশ'}</span>
-                    <span>${data.time || 'Just now'}</span>
-                </div>
-            `;
-            container.prepend(card);
+            container.innerHTML = "";
+            let count = 0;
 
-            // কাউন্ট আপডেট
-            const countElem = document.getElementById("notif-count");
-            countElem.innerText = parseInt(countElem.innerText || 0) + 1;
-        }
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                count++;
+
+                let roomBox = '';
+                if(data.hasRoomDetails) {
+                    roomBox = `
+                        <div class="room-details-box">
+                            <div class="room-row">
+                                <span>Room ID: <span class="room-val">${data.roomId}</span></span>
+                                <button class="btn-copy" onclick="copyText('${data.roomId}', this)"><i class="fa-regular fa-copy"></i> Copy ID</button>
+                            </div>
+                            <div class="room-row">
+                                <span>Password: <span class="room-val">${data.roomPass}</span></span>
+                                <button class="btn-copy" onclick="copyText('${data.roomPass}', this)"><i class="fa-regular fa-copy"></i> Copy Pass</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="notif-card ${data.target === 'ALL' ? 'all-user' : ''}">
+                        <h4>${data.title}</h4>
+                        <p>${data.message}</p>
+                        ${roomBox}
+                        <div class="notif-meta">
+                            <span class="target-badge">${data.target === 'MATCH_USERS' ? 'Match ID: ' + data.matchId : (data.target === 'SINGLE_USER' ? 'User: ' + data.singleUserId : 'সকলের জন্য')}</span>
+                            <span>${data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            badge.innerText = count;
+        });
     </script>
 </body>
 </html>
