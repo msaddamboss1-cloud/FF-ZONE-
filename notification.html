@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF ZONE - Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: #0d111a; color: #fff; max-width: 480px; margin: 0 auto; padding: 15px; }
+        
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1f2a3e; }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { font-size: 18px; color: #fff; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #141a26; border: 1px solid #1f2a3e; border-radius: 50%; transition: 0.2s; }
+        .back-btn:active { transform: scale(0.95); }
+
+        .logo-text { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
+        .logo-text .ff { color: #ff2a6d; }
+        .logo-text .zone { color: #00e5ff; }
+
+        .bell-box { position: relative; cursor: pointer; font-size: 24px; display: inline-block; }
+        .bell-icon {
+            background: linear-gradient(135deg, #ff2a6d 0%, #00e5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.6));
+            animation: bellGlow 2s infinite alternate;
+        }
+
+        @keyframes bellGlow {
+            0% { filter: drop-shadow(0 0 4px rgba(255, 42, 109, 0.6)); }
+            100% { filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.9)); }
+        }
+
+        .badge { position: absolute; top: -5px; right: -8px; background: #ff2a6d; color: #fff; font-size: 11px; font-weight: bold; border-radius: 50%; padding: 2px 6px; border: 1px solid #0d111a; }
+
+        .notif-header { display: flex; justify-content: space-between; align-items: center; margin: 18px 0 12px; }
+        .notif-title { font-size: 16px; font-weight: bold; color: #fff; }
+        .info-tag { font-size: 11px; color: #8292a6; }
+
+        .notif-card { background: #141a26; border: 1px solid #1f2a3e; border-radius: 12px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #ff2a6d; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .notif-card.all-user { border-left-color: #00e5ff; }
+        .notif-card h4 { font-size: 15px; color: #ffffff; margin-bottom: 6px; font-weight: 700; }
+        .notif-card p { font-size: 13px; color: #a0aec0; line-height: 1.4; word-break: break-word; }
+
+        /* Room ID & Pass Copy Section */
+        .room-details-box { background: #0d111a; border: 1px dashed #00e5ff; border-radius: 8px; padding: 10px 12px; margin: 10px 0; display: flex; flex-direction: column; gap: 8px; }
+        .room-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
+        .room-val { color: #00e5ff; font-family: monospace; font-size: 15px; letter-spacing: 0.5px; }
+        .btn-copy { background: #ff2a6d; color: #fff; border: none; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-copy:active { transform: scale(0.92); }
+
+        .notif-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: #64748b; }
+        .target-badge { background: #0d111a; padding: 3px 8px; border-radius: 4px; border: 1px solid #1f2a3e; color: #00e5ff; font-weight: 600; }
+
+        .empty-state { text-align: center; color: #64748b; padding: 40px 10px; font-size: 14px; }
+        .empty-state i { font-size: 36px; margin-bottom: 10px; color: #1f2a3e; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="nav-bar">
+        <div class="nav-left">
+            <!-- ড্যাশবোর্ডের ব্যাক বাটন -->
+            <a href="dashboard.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="logo-text">
+                <span class="ff">FF</span> <span class="zone">ZONE</span>
+            </div>
+        </div>
+
+        <div class="bell-box">
+            <i class="fa-solid fa-bell bell-icon"></i>
+            <span class="badge" id="notif-count">0</span>
+        </div>
+    </div>
+
+    <div class="notif-header">
+        <span class="notif-title">নোটিফিকেশন সমূহ</span>
+        <span class="info-tag">*গত ৭ দিনের নোটিফিকেশন</span>
+    </div>
+
+    <div id="notification-list">
+        <!-- কোনো ডেমো নোটিফিকেশন রাখা হয়নি। নতুন নোটিফিকেশন না থাকলে এই মেসেজ দেখাবে -->
+        <div class="empty-state">
+            <i class="fa-regular fa-bell-slash"></i>
+            কোনো নোটিফিকেশন পাওয়া যায়নি!
+        </div>
+    </div>
+
+    <script>
+        // কপি করার গ্লোবাল ফাংশন
+        function copyText(text, btnElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const origText = btnElement.innerHTML;
+                btnElement.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
+                btnElement.style.background = "#00e5ff";
+                btnElement.style.color = "#0d111a";
+                setTimeout(() => {
+                    btnElement.innerHTML = origText;
+                    btnElement.style.background = "#ff2a6d";
+                    btnElement.style.color = "#fff";
+                }, 1500);
+            });
+        }
+
+        // রেন্ডারিং হেলপার (আপনার ব্যাকএন্ড বা লোকাল ডেটার সাথে কানেক্ট করতে এই ফাংশন ব্যবহার করবেন)
+        function renderNotification(data) {
+            const container = document.getElementById("notification-list");
+            const emptyState = container.querySelector(".empty-state");
+            if (emptyState) emptyState.remove();
+
+            let roomBoxHtml = '';
+            if (data.hasRoomDetails) {
+                roomBoxHtml = `
+                    <div class="room-details-box">
+                        <div class="room-row">
+                            <span>Room ID: <span class="room-val">${data.roomId}</span></span>
+                            <button class="btn-copy" onclick="copyText('${data.roomId}', this)"><i class="fa-regular fa-copy"></i> Copy ID</button>
+                        </div>
+                        ${data.roomPass ? `
+                        <div class="room-row">
+                            <span>Password: <span class="room-val">${data.roomPass}</span></span>
+                            <button class="btn-copy" onclick="copyText('${data.roomPass}', this)"><i class="fa-regular fa-copy"></i> Copy Pass</button>
+                        </div>` : ''}
+                    </div>
+                `;
+            }
+
+            const card = document.createElement("div");
+            card.className = `notif-card ${data.target === 'ALL' ? 'all-user' : ''}`;
+            card.innerHTML = `
+                <h4>${data.title}</h4>
+                <p>${data.message}</p>
+                ${roomBoxHtml}
+                <div class="notif-meta">
+                    <span class="target-badge">${data.targetLabel || 'সাধারণ নোটিশ'}</span>
+                    <span>${data.time || 'Just now'}</span>
+                </div>
+            `;
+            container.prepend(card);
+
+            // কাউন্ট আপডেট
+            const countElem = document.getElementById("notif-count");
+            countElem.innerText = parseInt(countElem.innerText || 0) + 1;
+        }
+    </script>
+</body>
+</html>
