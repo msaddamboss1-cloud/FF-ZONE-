@@ -1,75 +1,49 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FF ZONE - Notifications</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- OneSignal SDK Integration -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "38b4db47-c5c2-4bb5-a56c-4bca3f708444",
+        });
+      });
+    </script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background: #0d111a; color: #fff; max-width: 480px; margin: 0 auto; padding: 15px; }
+        body { background: #090d16; color: #fff; max-width: 500px; margin: 0 auto; padding: 15px; }
+        .header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 15px; border-bottom: 1px solid #1f2a3e; margin-bottom: 15px; }
+        .notif-card { background: #141a26; border: 1px solid #1f2a3e; padding: 15px; border-radius: 12px; margin-bottom: 12px; }
+        .notif-title { color: #00e5ff; font-weight: bold; font-size: 16px; margin-bottom: 6px; }
+        .notif-body { color: #d1d5db; font-size: 14px; margin-bottom: 10px; line-height: 1.4; }
         
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1f2a3e; }
-        .nav-left { display: flex; align-items: center; gap: 12px; }
-        .back-btn { font-size: 18px; color: #fff; text-decoration: none; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #141a26; border: 1px solid #1f2a3e; border-radius: 50%; }
-
-        .logo-text { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
-        .logo-text .ff { color: #ff2a6d; }
-        .logo-text .zone { color: #00e5ff; }
-
-        .bell-box { position: relative; cursor: pointer; font-size: 24px; display: inline-block; }
-        .bell-icon {
-            background: linear-gradient(135deg, #ff2a6d 0%, #00e5ff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.6));
-        }
-
-        .badge { position: absolute; top: -5px; right: -8px; background: #ff2a6d; color: #fff; font-size: 11px; font-weight: bold; border-radius: 50%; padding: 2px 6px; border: 1px solid #0d111a; }
-
-        .notif-header { display: flex; justify-content: space-between; align-items: center; margin: 18px 0 12px; }
-        .notif-title { font-size: 16px; font-weight: bold; color: #fff; }
-
-        .notif-card { background: #141a26; border: 1px solid #1f2a3e; border-radius: 12px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #ff2a6d; }
-        .notif-card.all-user { border-left-color: #00e5ff; }
-        .notif-card h4 { font-size: 15px; color: #ffffff; margin-bottom: 6px; }
-        .notif-card p { font-size: 13px; color: #a0aec0; line-height: 1.4; word-break: break-word; }
-
-        .room-details-box { background: #0d111a; border: 1px dashed #00e5ff; border-radius: 8px; padding: 10px; margin: 10px 0; display: flex; flex-direction: column; gap: 8px; }
-        .room-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
-        .room-val { color: #00e5ff; font-family: monospace; font-size: 14px; }
-        .btn-copy { background: #ff2a6d; color: #fff; border: none; padding: 5px 10px; font-size: 11px; font-weight: bold; border-radius: 5px; cursor: pointer; }
-
-        .notif-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: #64748b; }
-        .target-badge { background: #0d111a; padding: 3px 8px; border-radius: 4px; border: 1px solid #1f2a3e; color: #00e5ff; font-weight: 600; }
-        .empty-msg { text-align: center; color: #64748b; padding: 30px; font-size: 14px; }
+        .room-box { background: #0d111a; padding: 12px; border-radius: 8px; border: 1px solid #00e5ff; margin-top: 10px; }
+        .room-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px; }
+        .room-row:last-child { margin-bottom: 0; }
+        .copy-btn { background: #ff2a6d; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="nav-bar">
-        <div class="nav-left">
-            <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-            <div class="logo-text"><span class="ff">FF</span> <span class="zone">ZONE</span></div>
-        </div>
-        <div class="bell-box">
-            <i class="fa-solid fa-bell bell-icon"></i>
-            <span class="badge" id="notif-count">0</span>
-        </div>
+    <div class="header">
+        <h2><i class="fa-solid fa-bell"></i> FF ZONE নোটিফিকেশন</h2>
     </div>
 
-    <div class="notif-header">
-        <span class="notif-title">নোটিফিকেশন সমুহ</span>
-    </div>
-
-    <div id="notification-list">
-        <div class="empty-msg">লোডিং নোটিফিকেশন...</div>
+    <div id="notif-list">
+        <p style="text-align: center; color: #888; margin-top: 20px;">লোড হচ্ছে...</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
         import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyA8jX_M4iqwdMm-RP10CUjd664GZrnrmQA",
@@ -84,98 +58,52 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const messaging = getMessaging(app);
 
-        // সার্ভিস ওয়ার্কার রেজিস্টার ও পুশ পারমিশন
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/firebase-messaging-sw.js')
-            .then((registration) => {
-                Notification.requestPermission().then((permission) => {
-                    if (permission === 'granted') {
-                        getToken(messaging, { 
-                            vapidKey: 'BKhgwTpdMogToFFkYYOnk0odAHdYXJ9Ek9LbylOwXy6ZNb2t9P--9pT6NdkT2o6A7c2l3dic_f6zHnbqRil3ppk',
-                            serviceWorkerRegistration: registration 
-                        }).then((currentToken) => {
-                            console.log("Token Received:", currentToken);
-                        }).catch(err => console.log("Token error:", err));
-                    }
-                });
-            });
-        }
-
-        // অ্যাপ স্ক্রিনে নোটিফিকেশন প্রদর্শন
-        onMessage(messaging, (payload) => {
-            const title = payload.notification ? payload.notification.title : payload.data.title;
-            const body = payload.notification ? payload.notification.body : payload.data.message;
-            new Notification(title, { body: body });
-        });
-
-        // কপি বাটন
-        window.copyText = function(text, btnElement) {
-            navigator.clipboard.writeText(text).then(() => {
-                const orig = btnElement.innerHTML;
-                btnElement.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
-                btnElement.style.background = "#00e5ff";
-                btnElement.style.color = "#0d111a";
-                setTimeout(() => {
-                    btnElement.innerHTML = orig;
-                    btnElement.style.background = "#ff2a6d";
-                    btnElement.style.color = "#fff";
-                }, 1500);
-            });
+        // টেক্সট কপি করার ফাংশন
+        window.copyText = function(text) {
+            navigator.clipboard.writeText(text);
+            alert("কপি করা হয়েছে: " + text);
         };
 
-        // ফায়ারস্টোর থেকে রিয়েলটাইম নোটিফিকেশন লোড
+        // রিয়েলটাইম লিস্ট লোড
         const q = query(collection(db, "notifications"), orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
-            const container = document.getElementById("notification-list");
-            const badge = document.getElementById("notif-count");
+            const list = document.getElementById('notif-list');
+            list.innerHTML = '';
 
-            if (snapshot.empty) {
-                container.innerHTML = `<div class="empty-msg">কোনো নোটিফিকেশন পাওয়া যায়নি</div>`;
-                badge.innerText = "0";
+            if(snapshot.empty) {
+                list.innerHTML = '<p style="text-align: center; color: #888; margin-top: 20px;">কোনো নোটিফিকেশন নেই</p>';
                 return;
             }
 
-            container.innerHTML = "";
-            let count = 0;
-
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                count++;
-
-                let roomBox = '';
+                const card = document.createElement('div');
+                card.className = 'notif-card';
+                
+                let roomHTML = '';
                 if(data.hasRoomDetails) {
-                    roomBox = `
-                        <div class="room-details-box">
+                    roomHTML = `
+                        <div class="room-box">
                             <div class="room-row">
-                                <span>Room ID: <span class="room-val">${data.roomId}</span></span>
-                                <button class="btn-copy" onclick="copyText('${data.roomId}', this)"><i class="fa-regular fa-copy"></i> Copy ID</button>
+                                <span style="color:#00e5ff;"><b>Room ID:</b> ${data.roomId}</span>
+                                <button class="copy-btn" onclick="copyText('${data.roomId}')">Copy ID</button>
                             </div>
                             <div class="room-row">
-                                <span>Password: <span class="room-val">${data.roomPass}</span></span>
-                                <button class="btn-copy" onclick="copyText('${data.roomPass}', this)"><i class="fa-regular fa-copy"></i> Copy Pass</button>
+                                <span style="color:#ff2a6d;"><b>Password:</b> ${data.roomPass}</span>
+                                <button class="copy-btn" onclick="copyText('${data.roomPass}')">Copy Pass</button>
                             </div>
                         </div>
                     `;
                 }
 
-                container.innerHTML += `
-                    <div class="notif-card ${data.target === 'ALL' ? 'all-user' : ''}">
-                        <h4>${data.title}</h4>
-                        <p>${data.message}</p>
-                        ${roomBox}
-                        <div class="notif-meta">
-                            <span class="target-badge">${data.target === 'MATCH_USERS' ? 'Match ID: ' + data.matchId : (data.target === 'SINGLE_USER' ? 'User: ' + data.singleUserId : 'সকলের জন্য')}</span>
-                            <span>${data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now'}</span>
-                        </div>
-                    </div>
+                card.innerHTML = `
+                    <div class="notif-title">${data.title}</div>
+                    <div class="notif-body">${data.message}</div>
+                    ${roomHTML}
                 `;
+                list.appendChild(card);
             });
-            badge.innerText = count;
-        }, (error) => {
-            console.error("Firestore error:", error);
-            document.getElementById("notification-list").innerHTML = `<div class="empty-msg" style="color:#ff2a6d">ডেটা লোড করতে সমস্যা হয়েছে!</div>`;
         });
     </script>
 </body>
