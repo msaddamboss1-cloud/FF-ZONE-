@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF ZONE - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK Setup -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+        // আপনার ফায়ারবেস কনফিগারেশন
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8jX_M4iqwdMm-RP10CUjd664GZrnrmQA",
+            authDomain: "rz-mod-menu.firebaseapp.com",
+            databaseURL: "https://rz-mod-menu-default-rtdb.firebaseio.com",
+            projectId: "rz-mod-menu",
+            storageBucket: "rz-mod-menu.firebasestorage.app",
+            messagingSenderId: "426988321516",
+            appId: "1:426988321516:web:33c8fd9492ee0ad58b03c9",
+            measurementId: "G-EDC9TH795S"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
+
+        let allMatchesData = [];
+
+        // ১. ফায়ারবেস থেকে ডাটা লোড
+        async function loadMatchesFromFirebase() {
+            allMatchesData = [];
+
+            try {
+                // Firestore Check
+                const querySnapshot = await getDocs(collection(db, "matches"));
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        allMatchesData.push({ id: doc.id, ...doc.data() });
+                    });
+                    window.allMatchesData = allMatchesData;
+                    filterMatches();
+                    return;
+                }
+            } catch (err) {
+                console.log("Firestore fetch error/empty:", err);
+            }
+
+            // Realtime Database Check
+            const matchesRef = ref(rtdb, 'matches');
+            onValue(matchesRef, (snapshot) => {
+                const data = snapshot.val();
+                allMatchesData = [];
+                if (data) {
+                    if (Array.isArray(data)) {
+                        allMatchesData = data.filter(item => item !== null);
+                    } else {
+                        Object.keys(data).forEach(key => {
+                            allMatchesData.push({ id: key, ...data[key] });
+                        });
+                    }
+                }
+                window.allMatchesData = allMatchesData;
+                filterMatches();
+            }, (error) => {
+                console.error("RTDB error:", error);
+                window.allMatchesData = [];
+                filterMatches();
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadMatchesFromFirebase();
+        });
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0d111a;
+            color: #ffffff;
+            max-width: 450px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding-bottom: 75px;
+        }
+
+        /* TOP HEADER */
+        .top-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 14px;
+            background-color: #0d111a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-frame {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            border: 2px solid #ff2a6d;
+            box-shadow: 0 0 10px rgba(255, 42, 109, 0.5);
+            overflow: hidden;
+            background: #141a26;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .logo-frame:active {
+            transform: scale(0.95);
+        }
+
+        .logo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .brand-title {
+            font-size: 19px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ff2a6d 0%, #00e5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wallet-wrapper {
+            background: linear-gradient(90deg, #ff2a6d, #00e5ff);
+            padding: 1.5px;
+            border-radius: 20px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .wallet-pill {
+            background: #121824;
+            padding: 5px 11px;
+            border-radius: 18px;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+        }
+
+        .wallet-pill i { color: #ff2a6d; }
+
+        .bell-wrapper {
+            background: linear-gradient(135deg, #ff2a6d, #00e5ff);
+            padding: 1.5px;
+            border-radius: 50%;
+            cursor: pointer;
+            text-decoration: none;
+            animation: bellGlowAnim 1.5s infinite alternate;
+        }
+
+        @keyframes bellGlowAnim {
+            0% { box-shadow: 0 0 5px #ff2a6d, 0 0 8px #00e5ff; }
+            100% { box-shadow: 0 0 15px #ff2a6d, 0 0 20px #00e5ff; }
+        }
+
+        .bell-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #121824;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 13px;
+            position: relative;
+        }
+
+        .bell-btn::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 6px;
+            height: 6px;
+            background: #ff2a6d;
+            border-radius: 50%;
+        }
+
+        /* LOGO MODAL */
+        .logo-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .expanded-logo {
+            width: 250px;
+            height: 250px;
+            border-radius: 20px;
+            border: 3px solid #ff2a6d;
+            box-shadow: 0 0 25px rgba(255, 42, 109, 0.8), 0 0 40px rgba(0, 229, 255, 0.5);
+            object-fit: cover;
+            transform: scale(0.7);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-modal-overlay.active .expanded-logo {
+            transform: scale(1);
+        }
+
+        /* FILTER SECTIONS */
+        .filter-container {
+            padding: 8px 12px;
+            background: #0d111a;
+        }
+
+        .main-filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 6px;
+            scrollbar-width: none;
+        }
+
+        .main-filters::-webkit-scrollbar { display: none; }
+
+        .filter-chip {
+            background: #141a26;
+            border: 1px solid #1f2a3e;
+            color: #8292a6;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(90deg, #ff2a6d, #ff0055);
+            color: #ffffff;
+            border-color: #ff2a6d;
+            box-shadow: 0 0 10px rgba(255, 42, 109, 0.4);
+        }
+
+        .sub-filters {
+            display: none;
+            gap: 6px;
+            overflow-x: auto;
+            white-space: nowrap;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            scrollbar-width: none;
+        }
+
+        .sub-filters::-webkit-scrollbar { display: none; }
+
+        .sub-chip {
+            background: #1a2333;
+            border: 1px solid #283752;
+            color: #00e5ff;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .sub-chip.active {
+            background: #00e5ff;
+            color: #000;
+            border-color: #00e5ff;
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        }
+
+        /* CARD CONTAINER */
+        .content-area { padding: 8px 12px; }
+
+        .match-card {
+            background: #141a26;
+            border: 1px solid #1f2a3e;
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .match-badge {
+            background: #1c2638;
+            color: #ff2a6d;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 42, 109, 0.3);
+        }
+
+        .map-badge {
+            color: #00e5ff;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .match-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .mode-tag {
+            background: rgba(255, 42, 109, 0.18);
+            color: #ff2a6d;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 42, 109, 0.3);
+        }
+
+        .match-time {
+            font-size: 11px;
+            color: #8292a6;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .fees-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .fee-box {
+            background: #090d15;
+            border: 1px solid #1f2a3e;
+            border-radius: 10px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .fee-label {
+            font-size: 10px;
+            color: #8292a6;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .entry-box .fee-label i { color: #ff2a6d; }
+        .kill-box .fee-label i { color: #00e5ff; }
+
+        .fee-value { font-size: 13px; font-weight: 900; }
+        .entry-box .fee-value { color: #ff2a6d; }
+        .kill-box .fee-value { color: #00e5ff; }
+
+        .prize-box {
+            background: #090d15;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .prize-header {
+            font-size: 11px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .prize-header i { color: #ffc107; }
+
+        .prize-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .prize-item {
+            background: #141a26;
+            border-radius: 7px;
+            padding: 7px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        .prize-item .label { color: #8292a6; font-weight: 600; }
+        .prize-item .amount { color: #00e5ff; font-weight: 800; }
+
+        .slot-section { margin-bottom: 14px; }
+
+        .slot-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #8292a6;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: #1d2738;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* প্রোগ্রেস বারে টু-কালার গ্র্যাডিয়েন্ট (লাল + নীল) */
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff2a6d 0%, #00e5ff 100%);
+            border-radius: 8px;
+        }
+
+        /* জয়েন বাটন: একপাশে লাল এবং অন্যপাশে নীল টু-কালার গ্র্যাডিয়েন্ট */
+        .btn-join {
+            width: 100%;
+            background: linear-gradient(90deg, #ff2a6d 0%, #00e5ff 100%);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 900;
+            padding: 11px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(255, 42, 109, 0.4);
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-join:active {
+            transform: scale(0.98);
+        }
+
+        .no-matches {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8292a6;
+            font-size: 13px;
+            background: #141a26;
+            border-radius: 12px;
+            border: 1px dashed #1f2a3e;
+            margin-top: 10px;
+        }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 450px;
+            background: #0d111a;
+            border-top: 1px solid #1f2a3e;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 6px 0;
+            z-index: 200;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: #8292a6;
+            font-size: 9px;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .nav-item i { font-size: 15px; }
+        .nav-item.active { color: #ff2a6d; }
+
+        .nav-center-btn {
+            position: relative;
+            top: -14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff2a6d 0%, #00e5ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 17px;
+            border: 2.5px solid #0d111a;
+            box-shadow: 0 0 15px #ff2a6d, 0 0 25px rgba(255, 42, 109, 0.6);
+            animation: redGlow 1.8s infinite alternate;
+        }
+
+        @keyframes redGlow {
+            0% { box-shadow: 0 0 8px #ff2a6d, 0 0 16px rgba(255, 42, 109, 0.4); }
+            100% { box-shadow: 0 0 18px #ff2a6d, 0 0 28px rgba(255, 42, 109, 0.9); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ১. হেডার -->
+    <div class="top-header">
+        <div class="brand-section">
+            <div class="logo-frame" id="main-logo-btn">
+                <img src="https://i.ibb.co.com/GD2TNhV/Screenshot-2026-08-30-14-09-34-700-com-google-android-apps-photos.png" alt="Logo">
+            </div>
+            <div class="brand-title">FF ZONE</div>
+        </div>
+        
+        <div class="header-actions">
+            <a href="wallet.html" class="wallet-wrapper">
+                <div class="wallet-pill">
+                    <i class="fa-solid fa-wallet"></i> <span id="wallet-amount">৳ ০.০০</span>
+                </div>
+            </a>
+
+            <a href="notification.html" class="bell-wrapper">
+                <div class="bell-btn">
+                    <i class="fa-regular fa-bell"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- লোগো পপ-আপ -->
+    <div class="logo-modal-overlay" id="logo-modal">
+        <img src="https://i.ibb.co.com/GD2TNhV/Screenshot-2026-08-30-14-09-34-700-com-google-android-apps-photos.png" class="expanded-logo" alt="Expanded Logo">
+    </div>
+
+    <!-- ২. ফিল্টার সেকশন -->
+    <div class="filter-container">
+        <div class="main-filters">
+            <button class="filter-chip active" onclick="selectMainMode('ALL', this)">ALL MODE</button>
+            <button class="filter-chip" onclick="selectMainMode('BR', this)">BR MODE</button>
+            <button class="filter-chip" onclick="selectMainMode('CS', this)">CS MODE</button>
+            <button class="filter-chip" onclick="selectMainMode('LONE_WOLF', this)">LONE WOLF</button>
+            <button class="filter-chip" onclick="selectMainMode('FUNNY', this)">FUNNY MODE</button>
+        </div>
+
+        <div class="sub-filters" id="cs-sub-filters">
+            <button class="sub-chip active" onclick="selectSubMode('ALL', this)">ALL</button>
+            <button class="sub-chip" onclick="selectSubMode('1v1', this)">1V1</button>
+            <button class="sub-chip" onclick="selectSubMode('2v2', this)">2V2</button>
+            <button class="sub-chip" onclick="selectSubMode('3v3', this)">3V3</button>
+            <button class="sub-chip" onclick="selectSubMode('4v4', this)">4V4</button>
+            <button class="sub-chip" onclick="selectSubMode('6v6', this)">6V6</button>
+        </div>
+
+        <div class="sub-filters" id="lonewolf-sub-filters">
+            <button class="sub-chip active" onclick="selectSubMode('ALL', this)">ALL</button>
+            <button class="sub-chip" onclick="selectSubMode('1v1', this)">1V1</button>
+            <button class="sub-chip" onclick="selectSubMode('2v2', this)">2V2</button>
+        </div>
+    </div>
+
+    <!-- ৩. ম্যাচ কন্টেইনার -->
+    <div class="content-area" id="matches-container">
+        <!-- ডায়নামিক ম্যাচ কার্ডসমূহ রেন্ডার হবে -->
+    </div>
+
+    <!-- ৪. বটম নেভিগেশন -->
+    <div class="bottom-nav">
+        <!-- পরিবর্তন: index.html এর জায়গায় dashboard.html করা হয়েছে এবং রিফ্রেশের জন্য onclick যোগ করা হয়েছে -->
+        <a href="dashboard.html" onclick="location.reload()" class="nav-item">
+            <i class="fa-solid fa-house"></i>
+            <span>হোম</span>
+        </a>
+
+        <a href="post.html" class="nav-item">
+            <i class="fa-regular fa-pen-to-square"></i>
+            <span>পোস্ট</span>
+        </a>
+
+        <a href="dashboard.html" class="nav-item active">
+            <div class="nav-center-btn">
+                <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <span>ম্যাচেস</span>
+        </a>
+
+        <a href="wallet.html" class="nav-item">
+            <i class="fa-solid fa-wallet"></i>
+            <span>ওয়ালেট</span>
+        </a>
+
+        <a href="profile.html" class="nav-item">
+            <i class="fa-regular fa-user"></i>
+            <span>প্রোফাইল</span>
+        </a>
+    </div>
+
+    <script>
+        // লোগো পপ-আপ হ্যান্ডলার
+        const logoBtn = document.getElementById('main-logo-btn');
+        const logoModal = document.getElementById('logo-modal');
+
+        logoBtn.addEventListener('click', () => {
+            logoModal.classList.add('active');
+        });
+
+        logoModal.addEventListener('click', () => {
+            logoModal.classList.remove('active');
+        });
+
+        // ফিল্টারিং লজিক (BR Mode Fix সহ)
+        let currentMainMode = 'ALL';
+        let currentSubMode = 'ALL';
+
+        function selectMainMode(mode, element) {
+            currentMainMode = mode;
+            currentSubMode = 'ALL';
+
+            document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            document.getElementById('cs-sub-filters').style.display = 'none';
+            document.getElementById('lonewolf-sub-filters').style.display = 'none';
+
+            if (mode === 'CS') {
+                document.getElementById('cs-sub-filters').style.display = 'flex';
+                resetSubChips('cs-sub-filters');
+            } else if (mode === 'LONE_WOLF') {
+                document.getElementById('lonewolf-sub-filters').style.display = 'flex';
+                resetSubChips('lonewolf-sub-filters');
+            }
+
+            filterMatches();
+        }
+
+        function selectSubMode(subMode, element) {
+            currentSubMode = subMode;
+
+            let parent = element.parentElement;
+            parent.querySelectorAll('.sub-chip').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            filterMatches();
+        }
+
+        function resetSubChips(containerId) {
+            const container = document.getElementById(containerId);
+            container.querySelectorAll('.sub-chip').forEach((el, idx) => {
+                if (idx === 0) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+        }
+
+        // ফিল্টার ফাংশন (Smart matching for BR and other modes)
+        function filterMatches() {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = "";
+
+            let matches = window.allMatchesData || [];
+
+            if (currentMainMode !== 'ALL') {
+                matches = matches.filter(m => {
+                    const modeStr = (m.mode || '').toString().toUpperCase().trim();
+                    if (currentMainMode === 'BR') {
+                        return modeStr === 'BR' || modeStr.includes('BR');
+                    } else if (currentMainMode === 'CS') {
+                        return modeStr === 'CS' || modeStr.includes('CS');
+                    } else if (currentMainMode === 'LONE_WOLF') {
+                        return modeStr === 'LONE_WOLF' || modeStr.includes('LONE') || modeStr.includes('WOLF');
+                    } else if (currentMainMode === 'FUNNY') {
+                        return modeStr === 'FUNNY' || modeStr.includes('FUNNY');
+                    }
+                    return modeStr === currentMainMode;
+                });
+            }
+
+            if (currentSubMode !== 'ALL') {
+                matches = matches.filter(m => {
+                    const subModeStr = (m.subMode || '').toString().toLowerCase().trim();
+                    return subModeStr === currentSubMode.toLowerCase();
+                });
+            }
+
+            if (matches.length === 0) {
+                container.innerHTML = `<div class="no-matches"><i class="fa-solid fa-ghost" style="font-size: 24px; margin-bottom: 8px;"></i><br>বর্তমানে এই ক্যাটাগরিতে কোনো ম্যাচ উপলোদ্ধ নেই!</div>`;
+                return;
+            }
+
+            matches.forEach(m => renderMatchCard(container, m));
+        }
+
+        // ডায়নামিক ম্যাচ কার্ড রেন্ডারিং (Null Value Removal & Dynamic ID Handling)
+        function renderMatchCard(container, match) {
+            // ডায়নামিক প্রাইজ লিস্ট চেক
+            let prizesList = [];
+            if (Array.isArray(match.prizes)) {
+                prizesList = match.prizes;
+            } else if (typeof match.prizes === 'object' && match.prizes !== null) {
+                prizesList = Object.values(match.prizes);
+            }
+
+            // ডায়নামিক ম্যাচ আইডি
+            const matchDisplayNo = match.matchNo || match.matchId || (match.id ? `#MATCH-${match.id.substring(0, 6)}` : '#MATCH');
+
+            const cardHTML = `
+                <div class="match-card">
+                    <div class="card-top-bar">
+                        <div class="match-badge">${matchDisplayNo}</div>
+                        <div class="map-badge">
+                            <i class="fa-solid fa-map-location-dot"></i> ${match.mapName || 'BERMUDA'}
+                        </div>
+                    </div>
+
+                    <div class="card-title-row">
+                        <div class="match-name">${match.title || 'BR MATCH'}</div>
+                        <div class="mode-tag">${match.subMode ? (match.mode || 'BR') + ' ' + match.subMode.toUpperCase() : (match.mode || 'BR') + ' MODE'}</div>
+                    </div>
+
+                    ${match.time ? `
+                    <div class="match-time">
+                        <i class="fa-regular fa-clock"></i> ${match.time}
+                    </div>` : ''}
+
+                    <div class="fees-container">
+                        <div class="fee-box entry-box">
+                            <span class="fee-label"><i class="fa-solid fa-ticket"></i> এন্ট্রি ফি</span>
+                            <span class="fee-value">৳ ${match.entryFee || '0'}</span>
+                        </div>
+                        <div class="fee-box kill-box">
+                            <span class="fee-label"><i class="fa-solid fa-crosshairs"></i> পার কিল</span>
+                            <span class="fee-value">${match.perKill ? '৳ ' + match.perKill : 'N/A'}</span>
+                        </div>
+                    </div>
+
+                    ${prizesList.length > 0 ? `
+                    <div class="prize-box">
+                        <div class="prize-header">
+                            <i class="fa-solid fa-trophy"></i> প্রাইজ ডিস্ট্রিবিউশন:
+                        </div>
+                        <div class="prize-grid">
+                            ${prizesList.map(p => `
+                                <div class="prize-item">
+                                    <span class="label">${p.rank || p.position || 'প্রাইজ'}</span>
+                                    <span class="amount">৳ ${p.amount || p.prize || '0'}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>` : ''}
+
+                    <div class="slot-section">
+                        <div class="slot-text">
+                            <span>স্লট বুকিং</span>
+                            <span>${match.bookedSlots || 0} / ${match.totalSlots || 48} জন</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: ${Math.min(100, ((match.bookedSlots || 0) / (match.totalSlots || 48)) * 100)}%;"></div>
+                        </div>
+                    </div>
+
+                    <a href="match-details.html?id=${match.id}" class="btn-join">
+                        <i class="fa-solid fa-shield-halved"></i> জয়েন করুন
+                    </a>
+                </div>
+            `;
+            container.innerHTML += cardHTML;
+        }
+    </script>
+</body>
+</html>
